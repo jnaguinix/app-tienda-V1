@@ -13,6 +13,7 @@ function renderMainReportTotals(filteredTransactions, filteredExpenses) {
 
     document.getElementById('report-profit-amount').textContent = formatCurrency(ganancia);
     document.getElementById('report-sales-amount').textContent = formatCurrency(totalVentas);
+    document.getElementById('report-expenses-amount').textContent = formatCurrency(totalGastos);
     document.getElementById('report-cash-amount').textContent = formatCurrency(totalEfectivo);
     document.getElementById('report-transfer-amount').textContent = formatCurrency(totalTransferencia);
     document.getElementById('report-credit-amount').textContent = formatCurrency(totalCredito);
@@ -171,6 +172,7 @@ export function initReportesView() {
     function clearReportSections() {
         document.getElementById('report-profit-amount').textContent = formatCurrency(0);
         document.getElementById('report-sales-amount').textContent = formatCurrency(0);
+        document.getElementById('report-expenses-amount').textContent = formatCurrency(0);
         document.getElementById('report-cash-amount').textContent = formatCurrency(0);
         document.getElementById('report-transfer-amount').textContent = formatCurrency(0);
         document.getElementById('report-credit-amount').textContent = formatCurrency(0);

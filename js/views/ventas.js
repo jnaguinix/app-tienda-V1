@@ -26,7 +26,6 @@ function renderizarVentas(fecha) {
                 <div class="amount ${amountClass}">${formatCurrency(t.valor)}</div>
                 <div class="item-actions-sale">
                     <button class="btn-editar-venta" data-id="${t.id}">✏️</button>
-                    <button class="btn-eliminar-venta" data-id="${t.id}">🗑️</button>
                 </div>`;
             listaTransaccionesEl.appendChild(itemEl);
             totalDelDia += t.valor;
@@ -46,6 +45,7 @@ export function setupVentaModal(transactionId = null) {
     const paymentButtons = document.querySelectorAll('#modal-nueva-transaccion .payment-btn');
     const formVenta = document.getElementById('form-nueva-transaccion');
     const saleIdInput = document.getElementById('sale-id');
+    const btnEliminarVentaModal = document.getElementById('btn-eliminar-venta-modal');
     setCurrentCart([]);
 
     function renderProductsInModal() {
@@ -163,6 +163,7 @@ export function setupVentaModal(transactionId = null) {
     selectCliente.innerHTML = '<option value="">Seleccione un comprador...</option>' + clientes.map(c => `<option value="${c.id}">${c.nombre}</option>`).join('');
     
     if (isEditMode) {
+        btnEliminarVentaModal.classList.remove('hidden');
         const tx = transacciones.find(t => t.id === transactionId);
         if (tx) {
             saleIdInput.value = tx.id;
@@ -188,7 +189,24 @@ export function setupVentaModal(transactionId = null) {
             });
             renderCart();
         }
+    } else {
+        btnEliminarVentaModal.classList.add('hidden');
     }
+
+    btnEliminarVentaModal.onclick = () => {
+        const idToDelete = parseInt(saleIdInput.value);
+        if (!idToDelete) return;
+
+        openModal('confirmarEliminacion', () => {
+            document.getElementById('btn-confirmar-eliminar').onclick = () => {
+                setTransacciones(transacciones.filter(t => t.id !== idToDelete));
+                closeModal();
+                closeModal();
+                renderizarVentas(document.getElementById('fecha-seleccionada').value);
+                initDeudasView();
+            };
+        });
+    };
 
     paymentButtons.forEach(button => button.addEventListener('click', () => {
         paymentButtons.forEach(btn => btn.classList.remove('selected'));
@@ -265,16 +283,6 @@ export function initVentasView() {
 
         if (target.classList.contains('btn-editar-venta')) {
             openModal('nuevaVenta', () => setupVentaModal(transactionId));
-        }
-        if (target.classList.contains('btn-eliminar-venta')) {
-            openModal('confirmarEliminacion', () => {
-                document.getElementById('btn-confirmar-eliminar').onclick = () => {
-                    setTransacciones(transacciones.filter(t => t.id !== transactionId));
-                    closeModal();
-                    renderizarVentas(fechaInput.value);
-                    initDeudasView();
-                };
-            });
         }
     };
 }

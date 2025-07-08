@@ -1,4 +1,4 @@
-// --- FUNCIONES DE UTILIDAD GENERAL ---
+// Esta es la única declaración de la función, no hay duplicados.
 export function showToast(message, type = 'error') {
     const existingToast = document.querySelector('.toast-notification');
     if (existingToast) {
@@ -32,7 +32,6 @@ export function formatCurrency(value) {
     return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(value); 
 }
 
-// --- LÓGICA DE CÁLCULO ---
 export function calcularBalances(clientes, transacciones, pagos) {
     const balances = {};
     clientes.forEach(c => {
@@ -55,8 +54,6 @@ export function calcularBalances(clientes, transacciones, pagos) {
 }
 
 
-// --- LÓGICA DE MODALES ---
-// VERSIÓN CORREGIDA: Solo una declaración de modalTemplates con todas las plantillas.
 export const modalTemplates = {
     nuevaVenta: `
         <div id="modal-nueva-transaccion" class="modal-overlay">
@@ -80,9 +77,10 @@ export const modalTemplates = {
                                     <button type="button" class="payment-btn" data-method="transferencia">Transferencia</button>
                                     <button type="button" class="payment-btn" data-method="credito">Crédito</button>
                                 </div>
-                                <div class="form-actions">
-                                    <button type="button" class="btn-cancelar btn-secondary">Cancelar</button>
-                                    <button type="submit" class="btn-primary">Guardar</button>
+                                <div class="form-actions" style="justify-content: space-between;">
+                                    <button type="button" class="btn-cancelar btn-secondary" style="flex-grow: 1;">Cancelar</button>
+                                    <button type="button" id="btn-eliminar-venta-modal" class="btn-danger hidden" style="flex-grow: 1; margin: 0 10px;">Eliminar</button>
+                                    <button type="submit" class="btn-primary" style="flex-grow: 1;">Guardar</button>
                                 </div>
                             </form>
                         </div>
@@ -119,7 +117,6 @@ export const modalTemplates = {
                 </form>
             </div>
         </div>`,
-    // MODIFICADO: Plantilla de gasto
     gasto: `
         <div id="modal-gasto" class="modal-overlay">
             <div class="modal-content form-modal">
