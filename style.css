@@ -1,0 +1,496 @@
+/* --- Estilos Generales y Variables --- */
+:root {
+    --primary-color: #3498db;
+    --secondary-color: #2ecc71;
+    --danger-color: #e74c3c;
+    --light-color: #ffffff;
+    --dark-color: #2c3e50;
+    --background-color: #ecf0f1;
+    --highlight-color: #d4edda; /* Color para resaltar selección */
+    --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+    font-family: var(--font-family);
+    background-color: var(--background-color);
+    color: var(--dark-color);
+    margin: 0;
+    padding-bottom: 100px;
+}
+
+/* --- Estructura Principal --- */
+header {
+    background-color: var(--primary-color);
+    color: var(--light-color);
+    padding: 1rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+header h1 {
+    text-align: center;
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+nav {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 1rem;
+}
+
+nav button {
+    background: none;
+    border: 1px solid var(--light-color);
+    color: var(--light-color);
+    padding: 0.5rem 1rem;
+    margin: 0;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.2s;
+}
+
+nav button.active {
+    background-color: var(--light-color);
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+main {
+    padding: 1rem;
+}
+
+.view { display: none; }
+.view.active { display: block; }
+
+/* --- Componentes Generales --- */
+.card {
+    background-color: var(--light-color);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.card h2 {
+    margin-top: 0;
+    color: var(--primary-color);
+    border-bottom: 1px solid #eee;
+    padding-bottom: 0.5rem;
+}
+
+.form-group { margin-bottom: 1rem; }
+.form-group label { display: block; margin-bottom: 0.5rem; font-weight: bold; }
+.form-group input, .form-group select, .form-group textarea {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    background-color: white;
+    font-family: inherit;
+}
+
+.item-list .item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid #eee;
+    gap: 0.5rem;
+}
+.item-list .item:last-child { border-bottom: none; }
+.item .details { flex-grow: 1; }
+.item .details p { margin: 0; }
+.item .details .description { font-size: 1rem; }
+.item .details .meta { font-size: 0.8rem; color: #7f8c8d; }
+.item .amount { font-weight: bold; font-size: 1.1rem; }
+.item .amount.credit { color: var(--danger-color); }
+.item .amount.cash { color: var(--secondary-color); }
+
+.item-actions-sale { display: flex; gap: 0.5rem; }
+.item-actions-sale button { background: none; border: 1px solid #ccc; padding: 0.3rem 0.6rem; border-radius: 5px; cursor: pointer; }
+
+.fab {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    cursor: pointer;
+    z-index: 999;
+}
+
+.btn-primary { background: var(--secondary-color); color: white; }
+.btn-secondary { background: #ccc; color: #333; }
+.btn-danger { background: var(--danger-color); color: white; }
+.form-actions { display: flex; justify-content: flex-end; gap: 10px; }
+.form-actions button { padding: 0.8rem 1.2rem; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+
+.hidden { display: none !important; }
+
+/* --- Notificación Toast --- */
+.toast-notification {
+    position: fixed;
+    bottom: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--danger-color);
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    z-index: 2000;
+    font-weight: bold;
+    opacity: 0;
+    transition: opacity 0.3s ease, bottom 0.3s ease;
+}
+.toast-notification.show {
+    opacity: 1;
+    bottom: 30px;
+}
+
+/* --- Vista de Resumen (Dashboard) --- */
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+}
+.summary-card {
+    background-color: var(--light-color);
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+.summary-card h3 {
+    margin-top: 0;
+    color: var(--primary-color);
+}
+.summary-card .value {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--dark-color);
+}
+.summary-card ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.summary-card li {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #eee;
+}
+.summary-card li:last-child {
+    border-bottom: none;
+}
+
+/* --- Vista de Ventas: Cuadro de Resumen --- */
+.top-bar-container {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+.top-bar-container .form-group {
+    flex: 1;
+    min-width: 150px;
+    margin-bottom: 0;
+}
+.total-sales-card {
+    background-color: var(--dark-color);
+    color: var(--light-color);
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    min-width: 240px;
+    padding: 0.5rem 1rem;
+    flex-wrap: wrap;
+}
+.total-section {
+    text-align: center;
+    padding: 0.5rem;
+}
+.total-sales-card h3 {
+    margin: 0 0 0.25rem 0;
+    color: var(--light-color);
+    font-size: 0.8rem;
+    font-weight: normal;
+    text-transform: uppercase;
+    border-bottom: none;
+    padding-bottom: 0;
+}
+.total-sales-card .total-amount {
+    font-size: 1.8rem;
+    font-weight: bold;
+}
+.total-amount.credit-amount {
+    color: var(--danger-color);
+}
+.total-amount.cash-amount {
+    color: var(--secondary-color);
+}
+.total-amount.profit-amount {
+    color: var(--primary-color);
+}
+
+/* --- Modal General --- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1001;
+    padding: 1rem;
+    box-sizing: border-box;
+}
+
+.modal-content {
+    background: var(--light-color);
+    border-radius: 10px;
+    width: 100%;
+    max-width: 800px;
+    height: 90vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-content h3 {
+    padding: 1rem;
+    margin: 0;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+}
+
+/* --- Modal de Nueva Venta --- */
+.sale-container { display: flex; flex: 1; overflow: hidden; }
+.product-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 0.75rem;
+    padding: 1rem;
+    overflow-y: auto;
+    border-right: 1px solid #eee;
+    align-content: flex-start;
+}
+.product-item {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    height: 55px; /* Altura reducida */
+    box-sizing: border-box;
+    user-select: none;
+}
+.product-item:active { transform: scale(0.98); }
+.product-item .name {
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+.product-item.selected { background-color: var(--highlight-color); border-color: var(--secondary-color); }
+.product-counter {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: var(--primary-color);
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.8rem;
+    font-weight: bold;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.cart-container { flex: 1; display: flex; flex-direction: column; padding: 1rem; min-width: 280px; min-height: 0; }
+.cart-items { flex: 1; overflow-y: auto; }
+
+.cart-item {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 0;
+}
+.cart-item .name {
+    flex: 1;
+    margin-right: 0.5rem;
+    font-size: 0.9rem;
+}
+.cart-item .quantity-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 90px;
+}
+.cart-item .quantity-controls button {
+    width: 30px; height: 30px; border-radius: 50%; border: 1px solid #ccc;
+    background-color: #f0f0f0; font-size: 1rem; cursor: pointer;
+}
+.cart-item .price {
+    font-weight: bold;
+    width: 80px;
+    text-align: right;
+}
+
+.cart-summary { padding-top: 1rem; border-top: 1px solid #eee; }
+.cart-total { font-size: 1.5rem; font-weight: bold; text-align: right; margin-bottom: 1rem; }
+.payment-options { display: flex; gap: 10px; margin-bottom: 1rem; }
+.payment-btn { flex-grow: 1; padding: 0.8rem; border: 1px solid #ccc; background: #f0f0f0; border-radius: 5px; cursor: pointer; }
+.payment-btn.selected { background: var(--primary-color); color: white; border-color: var(--primary-color); }
+
+/* --- Vista de Inventario --- */
+.inventory-row {
+    display: flex;
+    align-items: center;
+    padding: 0.8rem 0;
+}
+.inventory-row .details { flex: 1; }
+.inventory-row .amount { width: 90px; text-align: right; }
+.inventory-row .item-actions { width: 90px; text-align: center; }
+
+.inventory-header {
+    font-weight: bold;
+    border-bottom: 2px solid var(--dark-color);
+    margin-bottom: 0.5rem;
+}
+#view-inventario .item {
+    border-bottom: 1px solid #eee;
+}
+#view-inventario .item .item-actions button {
+     padding: 0.4rem 0.8rem; border: none; border-radius: 5px; cursor: pointer;
+}
+
+/* --- Vista de Deudas --- */
+#view-deudas .debtor-item {
+    cursor: pointer;
+    flex-wrap: wrap;
+}
+.debt-details {
+    width: 100%;
+    background-color: #f8f9fa;
+    padding: 0.75rem;
+    margin-top: 0.5rem;
+    border-radius: 5px;
+    border: 1px solid #eee;
+}
+.debt-details h4 {
+    margin: 0 0 0.75rem 0;
+    color: var(--primary-color);
+    font-size: 1rem;
+}
+.debt-details p {
+    margin: 0 0 0.5rem 0;
+    font-size: 0.9rem;
+    display: flex;
+    justify-content: space-between;
+}
+ .debt-details p:last-child {
+    margin-bottom: 0;
+}
+
+/* --- Vista de Historial --- */
+.history-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+.history-filters .filter-btn-group {
+    display: flex;
+    gap: 5px;
+}
+.history-filters button {
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    background-color: #f0f0f0;
+    cursor: pointer;
+}
+.history-filters button.active {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+.history-filters .filter-input {
+    flex-grow: 1;
+}
+
+/* --- Estilos para modal de formulario (Producto/Pago/Confirmación) --- */
+.modal-content.form-modal {
+    height: auto;
+    max-width: 400px;
+    padding: 1.5rem;
+}
+.modal-content.form-modal h3 {
+    padding: 0 0 1rem 0;
+    margin-bottom: 1rem;
+}
+.modal-content.form-modal p {
+    text-align: center;
+    margin-top: 0;
+}
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+    header h1 {
+        display: none;
+    }
+    nav {
+        margin-top: 0;
+    }
+    .sale-container { 
+        flex-direction: column; 
+    }
+    .product-list { 
+        border-right: none; 
+        border-bottom: 1px solid #eee; 
+        flex-shrink: 0;
+    }
+    .total-sales-card {
+        flex-wrap: wrap;
+    }
+    .total-section {
+        flex-basis: 45%;
+        margin-bottom: 0.5rem;
+    }
+    .total-sales-card .total-amount {
+        font-size: 1.5rem;
+    }
+    .inventory-row .amount, .inventory-header .amount {
+        width: 80px;
+    }
+     .inventory-row .item-actions, .inventory-header .item-actions {
+        width: 80px;
+    }
+}
