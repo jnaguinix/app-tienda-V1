@@ -56,7 +56,7 @@ export function initInventarioView() {
                 <div class="details"><p class="description">${p.nombre}</p></div>
                 <div class="amount">${formatCurrency(p.precio)}</div>
                 <div class="item-actions">
-                    <button class="btn-editar-producto btn-secondary" data-id="${p.id}">Editar</button>
+                    <button class="btn-editar-producto" data-id="${p.id}">✏️</button> <!-- CAMBIO: Icono de lápiz -->
                 </div>`;
             listaInventarioEl.appendChild(itemEl);
         });

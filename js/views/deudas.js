@@ -45,14 +45,16 @@ export function initDeudasView() {
         const itemEl = document.createElement('div');
         itemEl.className = 'item debtor-item';
         itemEl.dataset.clienteId = cliente.id;
+        
+        // CAMBIO: Agrupamos el monto y el botón en un div 'debtor-actions'
         itemEl.innerHTML = `
             <div class="details">
                 <p class="description">${cliente.nombre}</p>
                 <p class="meta">Deuda total: ${formatCurrency(totalDeuda)} | Pagado: ${formatCurrency(totalPagado)}</p>
             </div>
-            <div class="item-actions">
-                 <span class="amount ${saldo > 0 ? 'credit' : 'cash'}">${formatCurrency(saldo)}</span>
-                 ${saldo > 0 ? `<button class="btn-pagar btn-primary" data-cliente-id="${cliente.id}" data-deuda-total="${saldo}">Abonar</button>` : ''}
+            <div class="debtor-actions">
+                <span class="amount">${formatCurrency(saldo)}</span>
+                ${saldo > 0 ? `<button class="btn-pagar btn-primary" data-cliente-id="${cliente.id}" data-deuda-total="${saldo}">Abonar</button>` : ''}
             </div>`;
         listaDeudoresEl.appendChild(itemEl);
     });
@@ -64,7 +66,7 @@ export function initDeudasView() {
         if (payButton) {
             e.stopPropagation();
             const clienteId = payButton.dataset.clienteId;
-            const deudaTotal = payButton.dataset.deudaTotal;
+            const deudaTotal = parseFloat(payButton.dataset.deudaTotal);
             openModal('registrarPago', () => setupPagoModal(clienteId, deudaTotal));
             return;
         }
@@ -77,7 +79,7 @@ export function initDeudasView() {
             if (existingDetails) {
                 existingDetails.remove();
             } else {
-                const creditosPendientes = transacciones.filter(t => t.cliente_id === clienteId && t.metodo_pago === 'credito' && t.estado_deuda === 'pendiente');
+                const creditosPendientes = transacciones.filter(t => t.cliente_id === clienteId && t.metodo_pago === 'credito');
                 if (creditosPendientes.length > 0) {
                     const detailsContainer = document.createElement('div');
                     detailsContainer.className = 'debt-details';

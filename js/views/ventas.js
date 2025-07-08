@@ -1,6 +1,6 @@
-import { productos, clientes, transacciones, gastos, setTransacciones, currentCart, setCurrentCart } from '../state.js';
-import { formatCurrency, showToast, openModal, closeModal, getTodayString } from '../utils.js';
-import { initDeudasView } from './deudas.js'; // Importar para actualizar deudas
+import { productos, clientes, transacciones, setTransacciones, currentCart, setCurrentCart } from '../state.js';
+import { formatCurrency, showToast, openModal, closeModal } from '../utils.js';
+import { initDeudasView } from './deudas.js';
 
 function renderizarVentas(fecha) {
     const listaTransaccionesEl = document.getElementById('lista-transacciones');
@@ -33,14 +33,10 @@ function renderizarVentas(fecha) {
         });
     }
     
-    const gastoDelDia = gastos.find(g => g.fecha === fecha);
-    const montoGasto = gastoDelDia ? gastoDelDia.monto : 0;
-    document.getElementById('daily-expense-amount').value = montoGasto > 0 ? montoGasto : '';
-    
     document.getElementById('daily-totals-summary').textContent = `Total: ${formatCurrency(totalDelDia)}`;
 }
 
-function setupVentaModal(transactionId = null) {
+export function setupVentaModal(transactionId = null) {
     const isEditMode = transactionId !== null;
     const modalTitle = document.getElementById('sale-modal-title');
     const productListEl = document.getElementById('modal-product-list');
@@ -170,7 +166,22 @@ function setupVentaModal(transactionId = null) {
         const tx = transacciones.find(t => t.id === transactionId);
         if (tx) {
             saleIdInput.value = tx.id;
-            setCurrentCart(parseDescriptionToCart(tx.descripcion));
+            
+            if (tx.items_detalle && tx.items_detalle.length > 0) {
+                const cartFromDetails = tx.items_detalle.map(item => {
+                    const productoActual = productos.find(p => p.nombre === item.nombre);
+                    return {
+                        id: productoActual ? productoActual.id : null, 
+                        nombre: item.nombre,
+                        cantidad: item.cantidad,
+                        precio: item.precio_unitario 
+                    };
+                });
+                setCurrentCart(cartFromDetails);
+            } else {
+                setCurrentCart(parseDescriptionToCart(tx.descripcion));
+            }
+
             selectCliente.value = tx.cliente_id;
             paymentButtons.forEach(btn => {
                 btn.classList.toggle('selected', btn.dataset.method === tx.metodo_pago);
@@ -205,6 +216,12 @@ function setupVentaModal(transactionId = null) {
             showToast(errors.join(' '));
             return;
         }
+
+        const itemsDetalle = currentCart.map(item => ({
+            nombre: item.nombre,
+            cantidad: item.cantidad,
+            precio_unitario: item.precio 
+        }));
         
         const saleData = {
             fecha: document.getElementById('fecha-seleccionada').value,
@@ -212,7 +229,8 @@ function setupVentaModal(transactionId = null) {
             valor: currentCart.reduce((total, item) => total + (item.precio * item.cantidad), 0),
             metodo_pago: metodoPago,
             cliente_id: parseInt(selectCliente.value),
-            estado_deuda: metodoPago === 'credito' ? 'pendiente' : 'pagada'
+            estado_deuda: metodoPago === 'credito' ? 'pendiente' : 'pagada',
+            items_detalle: itemsDetalle
         };
 
         if (isEditMode) {
@@ -233,29 +251,11 @@ function setupVentaModal(transactionId = null) {
 
 export function initVentasView() {
     const fechaInput = document.getElementById('fecha-seleccionada');
-    const dailyExpenseInput = document.getElementById('daily-expense-amount');
     const listaTransaccionesEl = document.getElementById('lista-transacciones');
 
     renderizarVentas(fechaInput.value);
 
     fechaInput.oninput = () => renderizarVentas(fechaInput.value);
-
-    dailyExpenseInput.oninput = (e) => {
-        const fecha = fechaInput.value;
-        const monto = parseInt(e.target.value) || 0;
-        
-        let gastoExistente = gastos.find(g => g.fecha === fecha);
-        if (gastoExistente) {
-            if (monto > 0) {
-                 gastoExistente.monto = monto;
-            } else {
-                gastos = gastos.filter(g => g.fecha !== fecha);
-            }
-        } else if (monto > 0) {
-            gastos.push({ fecha, monto, nota: '' });
-        }
-        renderizarVentas(fecha);
-    };
 
     listaTransaccionesEl.onclick = (e) => {
         const target = e.target.closest('button');
@@ -277,6 +277,4 @@ export function initVentasView() {
             });
         }
     };
-    
-    document.getElementById('btn-nueva-venta').onclick = () => openModal('nuevaVenta', () => setupVentaModal());
 }

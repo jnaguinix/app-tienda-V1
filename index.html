@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Control Tienda Iglesia</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Librería Chart.js para los gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
@@ -12,6 +14,7 @@
         <h1>Tienda Iglesia</h1>
         <nav>
             <button class="active" data-view="ventas">Ventas</button>
+            <button data-view="gastos">Gastos</button>
             <button data-view="deudas">Deudas</button>
             <button data-view="reportes">Reportes</button>
             <button data-view="historial">Historial</button>
@@ -22,39 +25,60 @@
     <main>
         <!-- VISTA DE REPORTES -->
         <div id="view-reportes" class="view">
-            <div class="card total-sales-card">
-                <div class="total-section">
-                    <h3>Ganancia Mes</h3>
-                    <div id="monthly-profit-amount" class="total-amount profit-amount">$0</div>
-                </div>
-                <div class="total-section">
-                    <h3>Ventas Mes</h3>
-                    <div id="monthly-total-amount" class="total-amount">$0</div>
-                </div>
-                <div class="total-section">
-                    <h3>Contado Mes</h3>
-                    <div id="monthly-cash-amount" class="total-amount cash-amount">$0</div>
-                </div>
-                <div class="total-section">
-                    <h3>Crédito Mes</h3>
-                    <div id="monthly-credit-amount" class="total-amount credit-amount">$0</div>
+            <div class="card">
+                <h2>Filtro del Reporte</h2>
+                <div class="history-filters">
+                    <select id="report-filter-type" style="padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc;">
+                        <option value="month">Por Mes</option>
+                        <option value="range">Por Rango</option>
+                    </select>
+                    <input type="month" id="report-month-input" class="filter-input">
+                    <div id="report-range-inputs" class="filter-input hidden" style="display: flex; gap: 10px;">
+                        <input type="date" id="report-start-date">
+                        <input type="date" id="report-end-date">
+                    </div>
                 </div>
             </div>
+            <div class="card total-sales-card">
+                <div class="total-section">
+                    <h3>Ganancia</h3>
+                    <div id="report-profit-amount" class="total-amount profit-amount">$0</div>
+                </div>
+                <div class="total-section">
+                    <h3>Ventas</h3>
+                    <div id="report-sales-amount" class="total-amount">$0</div>
+                </div>
+                <div class="total-section">
+                    <h3>Efectivo</h3>
+                    <div id="report-cash-amount" class="total-amount cash-amount">$0</div>
+                </div>
+                <div class="total-section">
+                    <h3>Transferencia</h3>
+                    <div id="report-transfer-amount" class="total-amount cash-amount">$0</div>
+                </div>
+                <div class="total-section">
+                    <h3>Crédito</h3>
+                    <div id="report-credit-amount" class="total-amount credit-amount">$0</div>
+                </div>
+            </div>
+
             <div class="summary-grid">
                 <div class="summary-card">
-                    <h3>Producto Estrella</h3>
-                    <div id="summary-best-product" class="value">--</div>
-                </div>
-                <div class="summary-card">
-                    <h3>Top Deudores</h3>
-                    <ul id="summary-top-debtors">
-                        <li>No hay deudas</li>
+                    <h3>Productos Más Vendidos</h3>
+                    <ul id="report-best-products-list">
+                        <li>No hay ventas en este período.</li>
                     </ul>
                 </div>
                 <div class="summary-card">
-                    <h3>Últimos Pagos</h3>
-                    <ul id="summary-recent-payments">
-                        <li>No hay pagos</li>
+                    <h3>Distribución de Pagos</h3>
+                    <div class="chart-container">
+                        <canvas id="payment-distribution-chart"></canvas>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <h3>Últimos Pagos (Global)</h3>
+                    <ul id="report-recent-payments-list">
+                        <li>No se han recibido pagos.</li>
                     </ul>
                 </div>
             </div>
@@ -67,14 +91,39 @@
                     <label for="fecha-seleccionada">Fecha</label>
                     <input type="date" id="fecha-seleccionada">
                 </div>
-                <div class="form-group">
-                    <label for="daily-expense-amount">Inversión del Día ($)</label>
-                    <input type="number" id="daily-expense-amount" placeholder="Ej: 50000">
-                </div>
             </div>
             <div class="card">
                 <h2>Ventas del Día (<span id="daily-totals-summary">Total: $0</span>)</h2>
                 <div id="lista-transacciones" class="item-list"></div>
+            </div>
+        </div>
+
+        <!-- VISTA DE GASTOS -->
+        <div id="view-gastos" class="view">
+            <div class="card">
+                <h2>Gestión de Gastos</h2>
+                <div class="toolbar">
+                    <button id="btn-abrir-modal-gasto" class="btn-primary">Añadir Nuevo Gasto</button>
+                    <div class="filter-btn-group">
+                        <button class="filter-btn active" data-filter="all">Ver Todo</button>
+                        <button class="filter-btn" data-filter="month">Mes</button>
+                        <button class="filter-btn" data-filter="day">Día</button>
+                    </div>
+                </div>
+                <div class="filter-inputs-container">
+                    <input type="month" id="gastos-month-input" class="filter-input hidden">
+                    <input type="date" id="gastos-day-input" class="filter-input hidden">
+                </div>
+            </div>
+            <div class="card card-stretch">
+                 <div class="inventory-row inventory-header">
+                    <div class="details" style="flex: 2;">Fecha/Lugar</div>
+                    <div class="details" style="flex: 3;">Concepto</div>
+                    <div class="amount" style="flex: 1;">Monto</div>
+                    <div class="item-actions" style="flex: 0.5;"></div> 
+                </div>
+                <div id="lista-gastos" class="item-list"></div>
+                <div id="gastos-loading-indicator" style="text-align: center; padding: 1rem; color: #7f8c8d; display: none;">Cargando más...</div>
             </div>
         </div>
 
@@ -102,7 +151,7 @@
                 <div class="inventory-row inventory-header">
                     <div class="details">Producto</div>
                     <div class="amount">Precio</div>
-                    <div class="item-actions">Acciones</div>
+                    <div class="item-actions"></div>
                 </div>
                 <div id="lista-inventario" class="item-list"></div>
                 <div class="form-actions" style="justify-content: center; margin-top: 1rem;">
@@ -114,7 +163,7 @@
         <!-- VISTA DE HISTORIAL -->
         <div id="view-historial" class="view">
             <div class="card">
-                <h2>Historial de Ventas</h2>
+                <h2>Historial de Ventas y Pagos</h2>
                 <div class="history-filters">
                     <div class="filter-btn-group">
                         <button class="filter-btn active" data-filter="all">Ver Todo</button>
@@ -126,18 +175,15 @@
                 </div>
                 <div id="history-total" style="text-align: right; font-weight: bold; margin-bottom: 1rem;"></div>
             </div>
-            <div class="card">
+            <div class="card card-stretch">
                 <div id="lista-historial" class="item-list"></div>
+                <div id="history-loading-indicator" style="text-align: center; padding: 1rem; color: #7f8c8d; display: none;">Cargando más...</div>
             </div>
         </div>
     </main>
 
     <button class="fab" id="btn-nueva-venta" class="hidden">+</button>
-
-    <!-- MODALES -->
     <div id="modal-container"></div>
-
-    <!-- CAMBIO: script ahora es de tipo "module" y apunta a main.js -->
     <script type="module" src="js/main.js"></script>
 </body>
 </html>

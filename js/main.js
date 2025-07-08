@@ -1,24 +1,26 @@
-import { initVentasView } from './views/ventas.js';
+import { initVentasView, setupVentaModal } from './views/ventas.js'; // CAMBIO: Importar setupVentaModal
+import { initGastosView } from './views/gastos.js';
 import { initDeudasView } from './views/deudas.js';
 import { initReportesView } from './views/reportes.js';
 import { initInventarioView } from './views/inventario.js';
 import { initHistorialView } from './views/historial.js';
+import { openModal } from './utils.js';
 
-// --- ELEMENTOS PRINCIPALES DEL DOM ---
 const navButtons = document.querySelectorAll('nav button');
 const views = document.querySelectorAll('.view');
 const btnNuevaVenta = document.getElementById('btn-nueva-venta');
 
-// --- NAVEGACIÓN ---
 function switchView(viewName) {
     navButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.view === viewName));
     views.forEach(view => view.classList.toggle('active', view.id === `view-${viewName}`));
     btnNuevaVenta.classList.toggle('hidden', viewName !== 'ventas');
     
-    // Llama a la función de inicialización de la vista correspondiente
     switch(viewName) {
         case 'ventas': 
             initVentasView();
+            break;
+        case 'gastos':
+            initGastosView();
             break;
         case 'deudas': 
             initDeudasView();
@@ -35,25 +37,24 @@ function switchView(viewName) {
     }
 }
 
-// --- INICIALIZACIÓN DE LA APP ---
 function init() {
     const fechaInput = document.getElementById('fecha-seleccionada');
-    const historyDayInput = document.getElementById('history-day-input');
-    const historyMonthInput = document.getElementById('history-month-input');
+    if (fechaInput) {
+        fechaInput.value = new Date().toISOString().split('T')[0];
+    }
     
-    const today = new Date();
-    fechaInput.value = today.toISOString().split('T')[0];
-    historyDayInput.value = today.toISOString().split('T')[0];
-    historyMonthInput.value = today.toISOString().slice(0, 7);
-    
-    // Asignar listeners de navegación
     navButtons.forEach(button => {
         button.addEventListener('click', () => switchView(button.dataset.view));
     });
 
-    // Iniciar en la vista de ventas
+    // CAMBIO: El listener del botón FAB (+) ahora llama a setupVentaModal
+    if (btnNuevaVenta) {
+        btnNuevaVenta.onclick = () => {
+            openModal('nuevaVenta', () => setupVentaModal());
+        };
+    }
+
     switchView('ventas');
 }
 
-// Arrancar la aplicación cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', init);
